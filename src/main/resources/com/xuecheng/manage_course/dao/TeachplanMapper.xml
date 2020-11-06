@@ -28,7 +28,7 @@
         LEFT JOIN teachplan c ON c.parentid = b.id
         WHERE
             a.parentid = '0'
-            <if test="_parameter!=null and_parameter!=''">
+            <if test="_parameter!=null and _parameter!=''">
                 AND a.courseid=#{courseId}
             </if>
         ORDER BY
