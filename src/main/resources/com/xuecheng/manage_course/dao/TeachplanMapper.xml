@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xuecheng.manage_course.dao.CourseMapper">
-    <!-- 定义结果集map 解决实体类和数据库表 中字段不一致的问题或结果数据需要高度自定义-->
+<mapper namespace="com.xuecheng.manage_course.dao.TeachplanMapper">
     <resultMap id="techplanMap" type="com.xuecheng.framework.domain.course.ext.TeachplanNode">
-        <!--声明主键id-->
         <id property="id" column="one_id"/>
-        <!-- 声明字段-->
         <result property="pname" column="one_pname"/>
-        <!--一对多集合关系映射:配置sql 语句左外联two字段集合-->
         <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
             <id property="id" column="two_id"/>
             <result property="pname" column="two_pname"/>
-            <!-- 一对多集合关系映射：配置sql 语句左外联three字段集合-->
             <collection property="children" ofType="com.xuecheng.framework.domain.course.ext.TeachplanNode">
                 <id property="id" column="three_id"/>
                 <result property="pname" column="three_pname"/>
@@ -19,7 +14,6 @@
         </collection>
     </resultMap>
 
-    <!--查询课程计划-->
     <select id="selectList" resultMap="techplanMap" parameterType="String">
         SELECT
         a.id one_id,
