@@ -10,6 +10,8 @@ import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.dao.CourseBaseRepository;
 import com.xuecheng.manage_course.dao.TeachplanMapper;
 import com.xuecheng.manage_course.dao.TeachplanRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,7 @@ public class CourseService {
 
     /**
      * 获取课程根节点，如果没有根节点者添加
+     *
      * @param courseId
      * @return
      */
@@ -79,12 +82,49 @@ public class CourseService {
     /**
      * 添加课程计划
      * 使用spring的事务管理注解
+     *
      * @param teachplan
      * @return
      */
     @Transactional
-    public ResponseResult addTeachplanList(Teachplan teachplan){
-        return null;
+    public ResponseResult addTeachplanList(Teachplan teachplan) {
+        //校验课程id和课程名称
+        if (teachplan == null || StringUtils.isEmpty(teachplan.getCourseid()) || StringUtils.isEmpty(teachplan.getPname())) {
+            ExceptionCast.cast(CommonCode.INVALID_ARAM);
+        }
+        //取出课程id
+        String courseid = teachplan.getCourseid();
+        //取出页面传入的父节点id
+        String parentid = teachplan.getParentid();
+
+        //判断父节点是否为空
+        if (StringUtils.isEmpty(parentid)) {
+            //为空
+            //取得根节点
+            parentid = getTeachplanRoot(courseid);
+        }
+        //取得父节点信息
+        Optional<Teachplan> teachplanOptional = teachplanRepository.findById(parentid);
+        if (!teachplanOptional.isPresent()) {
+            ExceptionCast.cast(CommonCode.INVALID_ARAM);
+        }
+        //得到父节点级别
+        String NodeGrade = teachplanOptional.get().getGrade();
+        //拷贝teachplan信息到新节点teachplanNew
+        Teachplan teachplanNew = new Teachplan();
+
+        BeanUtils.copyProperties(teachplan, teachplanNew);
+
+        teachplanNew.setCourseid(courseid);
+        teachplanNew.setParentid(parentid);
+        //通过判断父节点级别来设置子节点级别
+        if (NodeGrade.equals("1")) {
+            teachplanNew.setGrade("2");
+        } else if (NodeGrade.equals("2")) {
+            teachplanNew.setGrade("3");
+        }
+        teachplanRepository.save(teachplanNew);
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 
 }
