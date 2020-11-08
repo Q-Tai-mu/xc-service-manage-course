@@ -2,11 +2,13 @@ package com.xuecheng.manage_course.service;
 
 import com.xuecheng.framework.domain.course.CourseBase;
 import com.xuecheng.framework.domain.course.Teachplan;
+import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.response.CourseCode;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.ResponseResult;
+import com.xuecheng.manage_course.dao.CategoryMapper;
 import com.xuecheng.manage_course.dao.CourseBaseRepository;
 import com.xuecheng.manage_course.dao.TeachplanMapper;
 import com.xuecheng.manage_course.dao.TeachplanRepository;
@@ -129,10 +131,11 @@ public class CourseService {
 
     /**
      * 修改课程计划
+     *
      * @param teachplan
      * @return
      */
-    public ResponseResult updateTeachplan(Teachplan teachplan){
+    public ResponseResult updateTeachplan(Teachplan teachplan) {
         //校验课程id和课程名称
         if (teachplan == null || StringUtils.isEmpty(teachplan.getCourseid()) || StringUtils.isEmpty(teachplan.getPname())) {
             ExceptionCast.cast(CommonCode.INVALID_ARAM);
@@ -140,4 +143,6 @@ public class CourseService {
         teachplanRepository.save(teachplan);
         return new ResponseResult(CommonCode.SUCCESS);
     }
+
+
 }

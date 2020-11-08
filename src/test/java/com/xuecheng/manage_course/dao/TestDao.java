@@ -30,6 +30,8 @@ public class TestDao {
     @Autowired
     TeachplanMapper teachplanMapper;
 
+    @Autowired
+    CategoryMapper categoryMapper;
 
     @Test
     public void testCourseBaseRepository() {
@@ -60,6 +62,10 @@ public class TestDao {
         Page<CourseBase> baseList = courseMapper.findCourseBaseList();
         System.out.println(baseList);
     }
-
+    @Test
+    public void cateMapper() {
+        CategoryNode categoryNode = categoryMapper.findCateGoryList();
+        System.out.println(categoryNode);
+    }
 
 }
