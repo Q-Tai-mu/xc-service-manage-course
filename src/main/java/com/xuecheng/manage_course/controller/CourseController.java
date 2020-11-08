@@ -45,4 +45,16 @@ public class CourseController implements CourseControllerApi {
     public ResponseResult addTeachplan(@RequestBody Teachplan teachplan) {
         return courseService.addTeachplanList(teachplan);
     }
+
+    /**
+     * 修改课程计划
+     *
+     * @param teachplan
+     * @return
+     */
+    @Override
+    @PutMapping("/teachplan/update")
+    public ResponseResult updateTeachplan(@RequestBody Teachplan teachplan) {
+        return courseService.updateTeachplan(teachplan);
+    }
 }

@@ -127,4 +127,17 @@ public class CourseService {
         return new ResponseResult(CommonCode.SUCCESS);
     }
 
+    /**
+     * 修改课程计划
+     * @param teachplan
+     * @return
+     */
+    public ResponseResult updateTeachplan(Teachplan teachplan){
+        //校验课程id和课程名称
+        if (teachplan == null || StringUtils.isEmpty(teachplan.getCourseid()) || StringUtils.isEmpty(teachplan.getPname())) {
+            ExceptionCast.cast(CommonCode.INVALID_ARAM);
+        }
+        teachplanRepository.save(teachplan);
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
 }
