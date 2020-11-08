@@ -3,6 +3,7 @@ package com.xuecheng.manage_course.dao;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.manage_course.ManageCourseApplication;
 import org.junit.Test;
@@ -28,6 +29,7 @@ public class TestDao {
 
     @Autowired
     TeachplanMapper teachplanMapper;
+
 
     @Test
     public void testCourseBaseRepository() {
@@ -58,4 +60,6 @@ public class TestDao {
         Page<CourseBase> baseList = courseMapper.findCourseBaseList();
         System.out.println(baseList);
     }
+
+
 }
