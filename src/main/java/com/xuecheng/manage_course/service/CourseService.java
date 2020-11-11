@@ -1,24 +1,32 @@
 package com.xuecheng.manage_course.service;
 
+import com.github.pagehelper.PageHelper;
+import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
+import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.response.CourseCode;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
+import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.framework.model.response.ResponseResult;
-import com.xuecheng.manage_course.dao.CategoryMapper;
-import com.xuecheng.manage_course.dao.CourseBaseRepository;
-import com.xuecheng.manage_course.dao.TeachplanMapper;
-import com.xuecheng.manage_course.dao.TeachplanRepository;
+import com.xuecheng.manage_course.dao.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -37,6 +45,9 @@ public class CourseService {
 
     @Autowired
     private TeachplanRepository teachplanRepository;
+
+    @Autowired
+    private CoursePicRepository coursePicRepository;
 
     public TeachplanNode findTeachplanList(String courseId) {
         TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
@@ -144,5 +155,72 @@ public class CourseService {
         return new ResponseResult(CommonCode.SUCCESS);
     }
 
+
+    public ResponseResult coursebaseAdd(CourseBase courseBase) {
+        if (courseBase == null) {
+            ExceptionCast.cast(CommonCode.FAIL);
+        }
+        courseBaseRepository.save(courseBase);
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    /**
+     * 查询课程基本信息
+     *
+     * @param page 第几页
+     * @param size 多少条
+     * @param map  查询条件
+     * @return CourseInfo 集合
+     */
+    public QueryResponseResult findCourseInfo(Integer page, Integer size, Map<String, Object> map) {
+        //先不管条件参数，因为不确定条件参数是什么类型
+        if (page <= 0) {
+            page = 1;
+        }
+        if (size <= 0) {
+            size = 7;
+        }
+        page = page - 1;
+        //准备返回集合对象
+        List<CourseInfo> courseInfos = new ArrayList<>();
+        //分页查询，分页对象 ,得到每个课程
+        List<CourseBase> content  = courseBaseRepository.findAll(PageRequest.of(page, size)).getContent();
+        //遍历每个课程对象，根据课程的id查询课程所对应的图片
+        for (CourseBase base : content) {
+            //课程图片对象
+            Optional<CoursePic> coursePic = coursePicRepository.findById(base.getId());
+            CoursePic ic = null;
+            //图片对象不存在，则添加图片对象
+            if (!coursePic.isPresent()) {
+                ic = new CoursePic();
+                ic.setCourseid(base.getId());
+                ic.setPic("");
+                //添加一个课程图片对象
+                coursePicRepository.save(ic);
+
+            } else {
+                ic = coursePic.get();
+            }
+
+            //取出课程图片对象
+            CoursePic pic = ic;
+            //准备封装对象
+            CourseInfo courseInfo = new CourseInfo();
+            //拷贝图片对象
+            BeanUtils.copyProperties(pic,courseInfo);
+            //剩余的值都进行拷贝
+            BeanUtils.copyProperties(base, courseInfo);
+            //添加到courseInfos
+            courseInfos.add(courseInfo);
+        }
+        //封装结果集对象
+        QueryResult<CourseInfo> result = new QueryResult<>();
+        //封装数据
+        result.setList(courseInfos);
+        //封装多少条记录
+        result.setTotal(courseInfos.size());
+        //返回结果集
+        return new QueryResponseResult(CommonCode.SUCCESS, result);
+    }
 
 }

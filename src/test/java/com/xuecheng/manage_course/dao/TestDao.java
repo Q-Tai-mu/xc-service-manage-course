@@ -7,14 +7,12 @@ import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.system.SysDictionary;
 import com.xuecheng.manage_course.ManageCourseApplication;
-import com.xuecheng.manage_course.service.SysDictionaryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,8 +33,7 @@ public class TestDao {
     @Autowired
     CategoryMapper categoryMapper;
 
-    @Autowired
-    SysDictionaryService dictionaryService;
+
 
     @Test
     public void testCourseBaseRepository() {
@@ -73,10 +70,6 @@ public class TestDao {
         System.out.println(categoryNode);
     }
 
-    @Test
-    public void sysRepository(){
-        SysDictionary byType = dictionaryService.getByType("200");
-        System.out.println(byType);
-    }
+
 
 }
