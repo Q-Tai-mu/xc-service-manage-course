@@ -3,12 +3,15 @@ package com.xuecheng.manage_course.service;
 import com.github.pagehelper.PageHelper;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CourseMarket;
 import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
 import com.xuecheng.framework.domain.course.response.CourseCode;
+import com.xuecheng.framework.domain.course.response.CourseMarketCode;
+import com.xuecheng.framework.domain.course.response.CoursePicCode;
 import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
@@ -48,6 +51,9 @@ public class CourseService {
 
     @Autowired
     private CoursePicRepository coursePicRepository;
+
+    @Autowired
+    private CourseMarketRepository marketRepository;
 
     public TeachplanNode findTeachplanList(String courseId) {
         TeachplanNode teachplanNode = teachplanMapper.selectList(courseId);
@@ -184,7 +190,7 @@ public class CourseService {
         //准备返回集合对象
         List<CourseInfo> courseInfos = new ArrayList<>();
         //分页查询，分页对象 ,得到每个课程
-        List<CourseBase> content  = courseBaseRepository.findAll(PageRequest.of(page, size)).getContent();
+        List<CourseBase> content = courseBaseRepository.findAll(PageRequest.of(page, size)).getContent();
         //遍历每个课程对象，根据课程的id查询课程所对应的图片
         for (CourseBase base : content) {
             //课程图片对象
@@ -207,7 +213,7 @@ public class CourseService {
             //准备封装对象
             CourseInfo courseInfo = new CourseInfo();
             //拷贝图片对象
-            BeanUtils.copyProperties(pic,courseInfo);
+            BeanUtils.copyProperties(pic, courseInfo);
             //剩余的值都进行拷贝
             BeanUtils.copyProperties(base, courseInfo);
             //添加到courseInfos
@@ -221,6 +227,126 @@ public class CourseService {
         result.setTotal(courseInfos.size());
         //返回结果集
         return new QueryResponseResult(CommonCode.SUCCESS, result);
+    }
+
+    /**
+     * 获取课程基本信息
+     *
+     * @param courseId
+     * @return
+     * @throws RuntimeException
+     */
+    public CourseBase getCourseBaseById(String courseId) throws RuntimeException {
+        if (StringUtils.isEmpty(courseId)) {
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
+        }
+        Optional<CourseBase> optional = courseBaseRepository.findById(courseId);
+        if (!optional.isPresent()) {
+            ExceptionCast.cast(CourseCode.COURSE_NOULL_OBJECT);
+        }
+        return optional.get();
+    }
+
+    /**
+     * 更新基本课程信息
+     *
+     * @param courseId
+     * @param courseBase
+     * @return
+     * @throws RuntimeException
+     */
+    public ResponseResult updateCourseBase(String courseId, CourseBase courseBase) throws RuntimeException {
+        //参数id判断
+        if (StringUtils.isEmpty(courseId)) {
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
+        }
+        //先根据id查询对象
+        Optional<CourseBase> optional = courseBaseRepository.findById(courseId);
+        //当对象不存在
+        if (!optional.isPresent()) {
+            ExceptionCast.cast(CourseCode.COURSE_NOULL_OBJECT);
+        }
+        //取出对象
+        CourseBase base = optional.get();
+        //拷贝对象
+        BeanUtils.copyProperties(courseBase, base);
+        courseBaseRepository.save(base);
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    /**
+     * 根据courseId查询图片对象
+     *
+     * @param courseId
+     * @return
+     * @throws RuntimeException
+     */
+    public CoursePic findCoursePicImage(String courseId) throws RuntimeException {
+        if (StringUtils.isEmpty(courseId)) {
+            ExceptionCast.cast(CoursePicCode.COURSE_NOULL_OBJECT);
+        }
+        Optional<CoursePic> optional = coursePicRepository.findById(courseId);
+        if (!optional.isPresent()) {
+            ExceptionCast.cast(CoursePicCode.COURSE_NOULL_OBJECT);
+        }
+        return optional.get();
+    }
+
+    /**
+     * 根据courseId查询课程营销信息
+     *
+     * @param courseId
+     * @return
+     */
+    public CourseMarket getCourseMarketById(String courseId) {
+        if (StringUtils.isEmpty(courseId))
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
+        Optional<CourseMarket> optional = marketRepository.findById(courseId);
+        if (!optional.isPresent())
+            ExceptionCast.cast(CourseMarketCode.COURSE_NOULL_OBJECT);
+        return optional.get();
+    }
+
+    /**
+     * 更新课程营销信息
+     *
+     * @param id
+     * @param market
+     * @return
+     */
+    public ResponseResult updateCourseMarket(String id, CourseMarket market) {
+        if (StringUtils.isEmpty(id))
+            ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
+        Optional<CourseMarket> optional = marketRepository.findById(id);
+        if (!optional.isPresent())
+            marketRepository.save(market);
+        else
+            market.setId(id);
+        marketRepository.save(market);
+        return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    public ResponseResult addCoursePicImage(String courseId, String pic) {
+        if (StringUtils.isEmpty(courseId)) {
+            //抛出课程id，为空
+            ExceptionCast.cast(CoursePicCode.COURSE_ID_NIULL);
+        }
+        Optional<CoursePic> optional = coursePicRepository.findById(courseId);
+        CoursePic coursePic = new CoursePic();
+        if (optional.isPresent()) {
+            //有就修改
+            BeanUtils.copyProperties(optional.get(), coursePic);
+            coursePic.setPic(pic);
+        } else {
+            //没有则保存
+            coursePic.setCourseid(courseId);
+            coursePic.setPic(pic);
+        }
+        //根据上面的条件自动进行修改或者保存
+        coursePicRepository.save(coursePic);
+
+        //返回
+        return new ResponseResult(CommonCode.SUCCESS);
     }
 
 }

@@ -2,6 +2,8 @@ package com.xuecheng.manage_course.controller;
 
 import com.xuecheng.api.course.CourseControllerApi;
 import com.xuecheng.framework.domain.course.CourseBase;
+import com.xuecheng.framework.domain.course.CourseMarket;
+import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
@@ -90,6 +92,77 @@ public class CourseController implements CourseControllerApi {
     @GetMapping("/coursebase/list/{page}/{size}")
     public QueryResponseResult findCourseInfo(@PathVariable("page") Integer page, @PathVariable("size") Integer size, Map<String, Object> map) {
         return courseService.findCourseInfo(page, size, map);
+    }
+
+    /**
+     * 获取课程基本信息
+     *
+     * @param courseId
+     * @return
+     * @throws RuntimeException
+     */
+    @Override
+    @GetMapping("/courseview/{courseId}")
+    public CourseBase getCourseBaseById(@PathVariable("courseId") String courseId) throws RuntimeException {
+        return courseService.getCourseBaseById(courseId);
+    }
+
+    /**
+     * 修改课程基本信息
+     *
+     * @param courseId
+     * @param courseBase
+     * @return
+     * @throws RuntimeException
+     */
+    @Override
+    public ResponseResult updateCourseBase(String courseId, CourseBase courseBase) throws RuntimeException {
+        return courseService.updateCourseBase(courseId, courseBase);
+    }
+
+    /**
+     * 查询课程图片
+     *
+     * @param courseId
+     * @return
+     * @throws RuntimeException
+     */
+    @Override
+    @GetMapping("/coursepic/list/{courseId}")
+    public CoursePic findCoursePicImage(@PathVariable("courseId") String courseId) throws RuntimeException {
+        return courseService.findCoursePicImage(courseId);
+    }
+
+
+    @Override
+    @PostMapping("coursepic/add")
+    public ResponseResult addCoursePicImage(String courseId, String pic) {
+        return courseService.addCoursePicImage(courseId,pic);
+    }
+
+    /**
+     * 获取课程营销信息
+     *
+     * @param courseId
+     * @return
+     */
+    @Override
+    @GetMapping("/coursemarket/{courseId}")
+    public CourseMarket getCourseMarketById(@PathVariable("courseId") String courseId) {
+        return courseService.getCourseMarketById(courseId);
+    }
+
+    /**
+     * 需改课程营销信息
+     *
+     * @param courseId
+     * @param courseMarket
+     * @return
+     */
+    @Override
+    @PutMapping("/coursemarket/update/{courseId}")
+    public ResponseResult updateCourseMarket(@PathVariable("courseId") String courseId, @RequestBody CourseMarket courseMarket) {
+        return courseService.updateCourseMarket(courseId, courseMarket);
     }
 
 
