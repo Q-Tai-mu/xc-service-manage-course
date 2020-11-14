@@ -152,6 +152,7 @@ public class CourseService {
      * @param teachplan
      * @return
      */
+    @Transactional
     public ResponseResult updateTeachplan(Teachplan teachplan) {
         //校验课程id和课程名称
         if (teachplan == null || StringUtils.isEmpty(teachplan.getCourseid()) || StringUtils.isEmpty(teachplan.getPname())) {
@@ -255,6 +256,7 @@ public class CourseService {
      * @return
      * @throws RuntimeException
      */
+    @Transactional
     public ResponseResult updateCourseBase(String courseId, CourseBase courseBase) throws RuntimeException {
         //参数id判断
         if (StringUtils.isEmpty(courseId)) {
@@ -314,6 +316,7 @@ public class CourseService {
      * @param market
      * @return
      */
+    @Transactional
     public ResponseResult updateCourseMarket(String id, CourseMarket market) {
         if (StringUtils.isEmpty(id))
             ExceptionCast.cast(CourseCode.COURSE_PUBLISH_COURSEIDISNULL);
@@ -325,7 +328,7 @@ public class CourseService {
         marketRepository.save(market);
         return new ResponseResult(CommonCode.SUCCESS);
     }
-
+    @Transactional
     public ResponseResult addCoursePicImage(String courseId, String pic) {
         if (StringUtils.isEmpty(courseId)) {
             //抛出课程id，为空
@@ -349,4 +352,24 @@ public class CourseService {
         return new ResponseResult(CommonCode.SUCCESS);
     }
 
+
+    //删除课程图片
+    @Transactional
+    public ResponseResult deleteCoursePicImage(String courseId) {
+        //判断课程id是否为空
+        if (StringUtils.isEmpty(courseId)) {
+            ExceptionCast.cast(CoursePicCode.COURSE_ID_NIULL);
+        }
+        //根据课程id查询coursePic表中的bean对象
+        Optional<CoursePic> optional = coursePicRepository.findById(courseId);
+        if (!optional.isPresent()) {
+            ExceptionCast.cast(CourseCode.COURSE_NOULL_OBJECT);
+        }
+        //删除coursePic表中的bean的对象，成功返回1，失败返回0
+        int result = coursePicRepository.deleteByCourseid(courseId);
+        if (result > 0) {
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
+        return new ResponseResult(CommonCode.FAIL);
+    }
 }

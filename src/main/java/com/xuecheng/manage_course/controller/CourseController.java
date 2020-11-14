@@ -133,11 +133,27 @@ public class CourseController implements CourseControllerApi {
         return courseService.findCoursePicImage(courseId);
     }
 
-
+    /**
+     * 添加课程图片(文件系统中已经存在相关图片，这里只需要绑定信息即可)
+     * @param courseId
+     * @param pic
+     * @return
+     */
     @Override
     @PostMapping("coursepic/add")
-    public ResponseResult addCoursePicImage(String courseId, String pic) {
-        return courseService.addCoursePicImage(courseId,pic);
+    public ResponseResult addCoursePicImage(@RequestParam("courseId") String courseId, @RequestParam("pic") String pic) {
+        return courseService.addCoursePicImage(courseId, pic);
+    }
+
+    /**
+     * 删除课程图片（文件系统中的文件没权删除。因为其他微服务可能需要使用）
+     * @param courseId
+     * @return
+     */
+    @Override
+    @DeleteMapping("coursepic/delete")
+    public ResponseResult deleteCoursePicImage(@RequestParam("courseId") String courseId) {
+        return courseService.deleteCoursePicImage(courseId);
     }
 
     /**

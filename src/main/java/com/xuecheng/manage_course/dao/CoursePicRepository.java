@@ -9,4 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Description:
  */
 public interface CoursePicRepository extends JpaRepository<CoursePic,String> {
+
+    //删除成功返回1否则返回0
+    int deleteByCourseid(String courseId);
 }
