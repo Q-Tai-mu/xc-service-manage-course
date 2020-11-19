@@ -7,11 +7,14 @@ import com.xuecheng.framework.domain.course.CoursePic;
 import com.xuecheng.framework.domain.course.Teachplan;
 import com.xuecheng.framework.domain.course.ext.CategoryNode;
 import com.xuecheng.framework.domain.course.ext.CourseInfo;
+import com.xuecheng.framework.domain.course.ext.CourseView;
 import com.xuecheng.framework.domain.course.ext.TeachplanNode;
+import com.xuecheng.framework.domain.course.response.CoursePublishResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +32,7 @@ public class CourseController implements CourseControllerApi {
 
     @Autowired
     private CourseService courseService;
+
 
     /**
      * 查询课程计划
@@ -116,7 +120,8 @@ public class CourseController implements CourseControllerApi {
      * @throws RuntimeException
      */
     @Override
-    public ResponseResult updateCourseBase(String courseId, CourseBase courseBase) throws RuntimeException {
+    @PutMapping("/coursebase/update/{id}")
+    public ResponseResult updateCourseBase(@PathVariable("id") String courseId, @RequestBody CourseBase courseBase) throws RuntimeException {
         return courseService.updateCourseBase(courseId, courseBase);
     }
 
@@ -135,6 +140,7 @@ public class CourseController implements CourseControllerApi {
 
     /**
      * 添加课程图片(文件系统中已经存在相关图片，这里只需要绑定信息即可)
+     *
      * @param courseId
      * @param pic
      * @return
@@ -147,6 +153,7 @@ public class CourseController implements CourseControllerApi {
 
     /**
      * 删除课程图片（文件系统中的文件没权删除。因为其他微服务可能需要使用）
+     *
      * @param courseId
      * @return
      */
@@ -179,6 +186,41 @@ public class CourseController implements CourseControllerApi {
     @PutMapping("/coursemarket/update/{courseId}")
     public ResponseResult updateCourseMarket(@PathVariable("courseId") String courseId, @RequestBody CourseMarket courseMarket) {
         return courseService.updateCourseMarket(courseId, courseMarket);
+    }
+
+    /**
+     * 课程视图查询（包含以下4点数据）
+     * 课程基本信息
+     * 课程营销
+     * 课程图片
+     * 课程计划
+     *
+     * @param id
+     * @return 返回的是课程详情页所需数据
+     */
+    @Override
+    @GetMapping("/coursevieew/{id}")
+    public CourseView courseview(@PathVariable("id") String id) {
+        return courseService.getCourseView(id);
+    }
+
+    /**
+     * 课程预览
+     * 前端最终得到的url是由CMS微服务CmsPagePreViewController提供真正的预览
+     *
+     * @param id 课程id
+     * @return 返回一个包含课程预览地址的url（一个配置好的publish_dataUrlPre值+页面id）和操作代码
+     */
+    @Override
+    @PostMapping("/preview/{id}")
+    public CoursePublishResult preview(@PathVariable("id") String id) {
+        return courseService.preview(id);
+    }
+
+    @Override
+    @PostMapping("/publish/{id}")
+    public CoursePublishResult publish(@PathVariable("id") String id) {
+        return courseService.publish(id);
     }
 
 

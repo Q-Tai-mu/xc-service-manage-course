@@ -1,7 +1,7 @@
 server:
   port: 31200
 spring:
-  application:
+  application: #xc-service-manage-course
     name: xc-service-manage-course
   datasource:
     druid:
@@ -19,3 +19,20 @@ spring:
       minEvictableIdleTimeMillis: 300000  #连接在连接池的最小生存时间（毫秒）
 pagehelper:
   helper-dialect: mysql # 配置pageHelper插件数据库方言
+eureka:
+  client:
+    fetch-registry: true # 是否向eureka服务注册
+    register-with-eureka: true # 是否让eureka拉取到微服务信息
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:50101/eureka/}
+  instance:
+    prefer-ip-address: true # 向eureka注册自己的ip
+    ip-address: ${IP_ADDRESS:127.0.0.1}
+    instance-id: ${spring.application.name}:${server.port} # 指定实例的id
+course-publish:
+  siteId: 5fb338e10714b42f4e8492be
+  templateId: 5ad9a24d68db5239b8fef199
+  previewUrl: http://www.xuecheng.com/cms/preview/
+  pageWebPath: /course/detail/
+  pagePhysicalPath: /course/detail/
+  dataUrlPre: http://localhost:31200/course/courseview/
